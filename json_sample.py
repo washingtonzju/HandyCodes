@@ -1,3 +1,6 @@
+import json
+import codesc
+
 def parsing_log(data, f_name, user_name):
     '''
     json.load() method convert string like [{a:b},{c:d}] into respongding

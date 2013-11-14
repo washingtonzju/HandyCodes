@@ -3,7 +3,11 @@ import urllib2
 
 
 def query_api_data(url, params):
-
+    '''
+    url is the path to the API like www.example.com/path/to/api
+    params is a dictionary like {'param1':value, 'param2':value2, ... }
+    This funciton return a tuple like (200, "returned contents")
+    '''
     request = url + "?"
     for k,v in params.items():
         request = request + k + "=" + v

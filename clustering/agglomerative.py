@@ -9,6 +9,7 @@ import random
 import json
 import time
 import heapq
+import elbowcriterion
 from CosineLib import CosineLib
 
 class Agglomerative:
@@ -63,8 +64,10 @@ class Agglomerative:
             lst_1 = self.clusters[i]
             for j in range(i+1, len(cs)):
                 cnt += 1
+                """
                 if cnt % 100 == 0:
                     print "calculate the", cnt, "and cost", time.time() - start_time
+                """
                 dis = 0.0
                 lst_2 = self.clusters[j]
                 for v1 in lst_1:
@@ -90,6 +93,7 @@ class Agglomerative:
     def iterating(self, thresh_hold = None, file_prefix = None):
         start_time = time.time()
         curr_time = time.time()
+        scores = []
         while True:
             old_time = curr_time
             #print "Cluster Size: " + str(len(self.clusters))
@@ -157,9 +161,34 @@ class Agglomerative:
                 json_file.write(json.dumps(self.clusters))
                 json_file.close()
                 print "min_dis:", min_val, "number of clusters:", len(self.clusters), "cost time:", (curr_time - old_time), "secs"
+                scores.append(min_val)
+                
             else:
                 print "min_dis:", min_val, "number of clusters:", len(self.clusters), "cost time:", (curr_time - old_time), "secs"
             if len(self.clusters) < 2:
                 break
+        if thresh_hold == None:
+            scores.reverse()
+            idx, max_var = elbowcriterion.find_best_points(scores)
+            print "Best result is : ", idx, " and the max derivative variances is : ", max_var
         print "Cost ", (curr_time - start_time)/60.0, "mins"
         
+if __name__ == "__main__":
+
+    user_file = open("sample_data.json", "r")
+    users = json.load(user_file)
+    user_file.close()
+    agg = Agglomerative(users)
+    print len(agg.clusters)
+    print "preparing"
+    agg.prepare()
+    print "iterating"
+    agg.iterating()
+    """
+    cnt = 0
+    for key, val in agg.heaps.items():
+        cnt += 1
+        if cnt > 10:
+            break
+        print key, val
+    """
